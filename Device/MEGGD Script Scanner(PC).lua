@@ -4,7 +4,7 @@ local run_service = game:GetService("RunService")
 local text_service = game:GetService("TextService")
 local core_gui = game:GetService("CoreGui")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/FunctionCheck.lua", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
 
 local themes = {
     dark_blue = {
@@ -150,7 +150,7 @@ local title_text = create_instance("TextLabel", {
     Position = UDim2.new(0, 10, 0, 20),
     Size = UDim2.new(0, 150, 0, 18),
     Font = Enum.Font.Arcade,
-    Text = "Script Scanner",
+    Text = "Script Scanner PC",
     TextColor3 = current_theme.text,
     TextSize = 18,
     TextXAlignment = Enum.TextXAlignment.Left
@@ -305,16 +305,16 @@ draw_pixel_icon(close_button, {
     "10000001"
 }, Color3.fromRGB(220, 60, 60), 2)
 
-draw_pixel_icon(hide_button, {
-    "00000000",
-    "00000000",
-    "00000000",
-    "11111111",
-    "11111111",
-    "00000000",
-    "00000000",
-    "00000000"
-}, Color3.fromRGB(160, 200, 255), 2)
+local icon_hide = draw_pixel_icon(hide_button, {
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0111111110",
+    "0111111110",
+    "0000000000",
+    "0000000000",
+    "0000000000"
+}, current_theme.text, 2)
 
 local is_collapsed = false
 local original_main_size = UDim2.new(0, 420, 0, 360)
@@ -350,15 +350,18 @@ local function toggle_collapse()
         end
         tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -158, 0.5, -7)
+            Position = UDim2.new(1, -158, 0.5, -7),
+            Rotation = 360
         }):Play()
         tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -26, 0.5, -7)
+            Position = UDim2.new(1, -26, 0.5, -7),
+            Rotation = 360
         }):Play()
         tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -178, 0.5, -7)
+            Position = UDim2.new(1, -178, 0.5, -7),
+            Rotation = 360
         }):Play()
         tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, main_gui.AbsoluteSize.X, 0, 46)
@@ -370,15 +373,18 @@ local function toggle_collapse()
         }):Play()
         tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 80, 0, 30),
-            Position = UDim2.new(1, -168, 0, 8)
+            Position = UDim2.new(1, -168, 0, 8),
+            Rotation = 0
         }):Play()
         tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 30, 0, 30),
-            Position = UDim2.new(1, -38, 0, 8)
+            Position = UDim2.new(1, -38, 0, 8),
+            Rotation = 0
         }):Play()
         tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 30, 0, 30),
-            Position = UDim2.new(1, -178, 0, 8)
+            Position = UDim2.new(1, -178, 0, 8),
+            Rotation = 0
         }):Play()
         task.delay(0.15, function()
             for _, c in ipairs(search_container:GetDescendants()) do
@@ -606,7 +612,7 @@ local function make_scrollbar_interactive(scroll_frame)
     local start_canvas_pos = 0
 
     scroll_frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
             local rect = scroll_frame.AbsolutePosition
             local size = scroll_frame.AbsoluteSize
             local thickness = scroll_frame.ScrollBarThickness
@@ -625,7 +631,7 @@ local function make_scrollbar_interactive(scroll_frame)
     end)
     
     user_input_service.InputChanged:Connect(function(input)
-        if is_dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        if is_dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
             local size = scroll_frame.AbsoluteSize
             local content_size = scroll_frame.CanvasSize.Y.Offset
             local max_scroll = math.max(0, content_size - size.Y)
@@ -644,7 +650,7 @@ local function make_scrollbar_interactive(scroll_frame)
     end)
     
     user_input_service.InputEnded:Connect(function(input)
-        if (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1) and is_dragging then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and is_dragging then
             is_dragging = false
             tween_service:Create(scroll_frame, TweenInfo.new(0.2), {
                 ScrollBarImageColor3 = current_theme.accent
@@ -680,20 +686,20 @@ local function bind_tap(button, callback)
     local start_pos = nil
     local is_valid = false
     button.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
             start_pos = input.Position
             is_valid = true
         end
     end)
     button.InputChanged:Connect(function(input)
-        if start_pos and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        if start_pos and input.UserInputType == Enum.UserInputType.MouseMovement then
             if (input.Position - start_pos).Magnitude > 5 then
                 is_valid = false
             end
         end
     end)
     button.InputEnded:Connect(function(input)
-        if start_pos and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1) then
+        if start_pos and input.UserInputType == Enum.UserInputType.MouseButton1 then
             if is_valid and (input.Position - start_pos).Magnitude < 10 then
                 animate_button(button)
                 callback()
@@ -761,6 +767,8 @@ local function apply_theme(theme_name)
     for _, fr in ipairs(icon_loading:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
     icon_copy.BackgroundColor3 = current_theme.text
     for _, fr in ipairs(icon_copy:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
+    icon_hide.BackgroundColor3 = current_theme.text
+    for _, fr in ipairs(icon_hide:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
 end
 
 local theme_keys = {"vscode", "dark_blue", "dracula", "monokai"}
@@ -1197,4 +1205,4 @@ user_input_service.InputEnded:Connect(function(input)
         end
     end
 end)
-print("MEGGD Script Scanner PC - Loaded!")
+print("MEGGD Script Scanner - Loaded!")
