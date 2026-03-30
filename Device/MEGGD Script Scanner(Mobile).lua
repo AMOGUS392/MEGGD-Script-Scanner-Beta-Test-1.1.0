@@ -4,8 +4,6 @@ local run_service = game:GetService("RunService")
 local text_service = game:GetService("TextService")
 local core_gui = game:GetService("CoreGui")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
-
 local themes = {
     dark_blue = {
         bg = Color3.fromRGB(15, 20, 30),
@@ -73,7 +71,8 @@ local main_gui = create_instance("Frame", {
     Position = UDim2.new(0.5, -200, 0.5, -150),
     Size = UDim2.new(0, 420, 0, 360),
     Active = true,
-    ClipsDescendants = true
+    ClipsDescendants = true,
+    ZIndex = 10
 })
 
 local resize_handle = create_instance("Frame", {
@@ -82,7 +81,7 @@ local resize_handle = create_instance("Frame", {
     BackgroundTransparency = 1,
     Size = UDim2.new(0, 20, 0, 20),
     Active = true,
-    ZIndex = 10,
+    ZIndex = 11,
     AnchorPoint = Vector2.new(0, 0)
 })
 
@@ -104,8 +103,8 @@ local handle_part_v = create_instance("Frame", {
 
 local function update_resize_handle_position()
     resize_handle.Position = UDim2.new(
-        0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X,
-        0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y
+        0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X - 2,
+        0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y - 2
     )
 end
 
@@ -126,7 +125,7 @@ local top_bar = create_instance("Frame", {
 
 local meggd_badge = create_instance("Frame", {
     Parent = top_bar,
-    BackgroundTransparency = 1,
+    BackgroundColor3 = Color3.fromRGB(0, 150, 255),
     BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 7),
     Size = UDim2.new(0, 50, 0, 14)
@@ -140,10 +139,8 @@ local meggd_text = create_instance("TextLabel", {
     Font = Enum.Font.Arcade,
     Text = "MEGGD",
     TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextStrokeTransparency = 0,
-    TextStrokeColor3 = Color3.fromRGB(0, 200, 255),
     TextSize = 14,
-    TextXAlignment = Enum.TextXAlignment.Left,
+    TextXAlignment = Enum.TextXAlignment.Center,
     TextYAlignment = Enum.TextYAlignment.Center
 })
 
@@ -174,18 +171,6 @@ local theme_button = create_instance("TextButton", {
 })
 button_colors[theme_button] = current_theme.bg
 
-local hide_button = create_instance("TextButton", {
-    Parent = top_bar,
-    BackgroundColor3 = current_theme.bg,
-    BorderColor3 = current_theme.border,
-    BorderSizePixel = 1,
-    Position = UDim2.new(1, -72, 0, 8),
-    Size = UDim2.new(0, 30, 0, 30),
-    Text = "",
-    AutoButtonColor = false
-})
-button_colors[hide_button] = current_theme.bg
-
 local close_button = create_instance("TextButton", {
     Parent = top_bar,
     BackgroundColor3 = current_theme.bg,
@@ -197,6 +182,18 @@ local close_button = create_instance("TextButton", {
     AutoButtonColor = false
 })
 button_colors[close_button] = current_theme.bg
+
+local hide_button = create_instance("TextButton", {
+    Parent = top_bar,
+    BackgroundColor3 = current_theme.bg,
+    BorderColor3 = current_theme.border,
+    BorderSizePixel = 1,
+    Position = UDim2.new(1, -72, 0, 8),
+    Size = UDim2.new(0, 30, 0, 30),
+    Text = "",
+    AutoButtonColor = false
+})
+button_colors[hide_button] = current_theme.bg
 
 local floating_hide = create_instance("TextButton", {
     Parent = screen_gui,
@@ -556,10 +553,12 @@ local function make_scrollbar_interactive(scroll_frame)
             local rect = scroll_frame.AbsolutePosition
             local size = scroll_frame.AbsoluteSize
             local thickness = scroll_frame.ScrollBarThickness
+            
             if input.Position.X >= rect.X + size.X - thickness - 5 then
                 is_dragging = true
                 drag_start_y = input.Position.Y
                 start_canvas_pos = scroll_frame.CanvasPosition.Y
+                
                 local h, s, v = current_theme.accent:ToHSV()
                 tween_service:Create(scroll_frame, TweenInfo.new(0.15), {
                     ScrollBarImageColor3 = Color3.fromHSV(h, s * 0.5, math.min(1, v * 1.5))
@@ -573,12 +572,15 @@ local function make_scrollbar_interactive(scroll_frame)
             local size = scroll_frame.AbsoluteSize
             local content_size = scroll_frame.CanvasSize.Y.Offset
             local max_scroll = math.max(0, content_size - size.Y)
+            
             if max_scroll > 0 then
                 local delta_y = input.Position.Y - drag_start_y
                 local track_space = size.Y
                 local scroll_ratio = max_scroll / track_space
+                
                 local new_pos = start_canvas_pos + (delta_y * scroll_ratio * 1.5)
                 new_pos = math.clamp(new_pos, 0, max_scroll)
+                
                 scroll_frame.CanvasPosition = Vector2.new(scroll_frame.CanvasPosition.X, new_pos)
             end
         end
@@ -718,16 +720,20 @@ bind_tap(hide_button, function()
         is_collapsed = true
         original_main_size = main_gui.Size
         original_main_pos = main_gui.Position
+        
         local center_pos = UDim2.new(0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X / 2, 0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y / 2)
+        
         floating_hide.Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
+        
+        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0)
+        }):Play()
+
         local tw = tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 0, 0, 0),
             Position = center_pos
         })
         tw:Play()
-        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 0, 0, 0)
-        }):Play()
         tw.Completed:Connect(function()
             main_gui.Visible = false
             floating_hide.Visible = true
@@ -751,14 +757,46 @@ bind_tap(floating_hide, function()
         tw.Completed:Connect(function()
             floating_hide.Visible = false
             main_gui.Visible = true
+            
+            tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 20, 0, 20)
+            }):Play()
+
             tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 Size = original_main_size,
                 Position = original_main_pos
             }):Play()
-            tween_service:Create(resize_handle, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 20, 0, 20)
-            }):Play()
         end)
+    end
+end)
+
+local is_dragging_floating = false
+local floating_drag_start_pos
+local floating_start_pos
+
+floating_hide.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        is_dragging_floating = true
+        floating_drag_start_pos = input.Position
+        floating_start_pos = floating_hide.Position
+    end
+end)
+
+user_input_service.InputChanged:Connect(function(input)
+    if is_dragging_floating and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        local delta = input.Position - floating_drag_start_pos
+        floating_hide.Position = UDim2.new(
+            floating_start_pos.X.Scale,
+            floating_start_pos.X.Offset + delta.X,
+            floating_start_pos.Y.Scale,
+            floating_start_pos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+user_input_service.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        is_dragging_floating = false
     end
 end)
 
@@ -1194,4 +1232,6 @@ user_input_service.InputEnded:Connect(function(input)
         end
     end
 end)
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
 print("MEGGD Script Scanner Mobile - Loaded!")
