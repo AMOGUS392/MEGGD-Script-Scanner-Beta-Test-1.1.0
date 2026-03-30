@@ -4,7 +4,7 @@ local run_service = game:GetService("RunService")
 local text_service = game:GetService("TextService")
 local core_gui = game:GetService("CoreGui")
 
-loadstring(game:HttpGet("YOUR_WARNING_CHECKER_URL_HERE", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
 
 local themes = {
     dark_blue = {
