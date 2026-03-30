@@ -46,6 +46,7 @@ local type_colors = {
 local current_theme = themes.vscode
 local flat_image = "rbxassetid://2790382281"
 local decompile_cache = {}
+local button_colors = {}
 
 local function create_instance(class_name, properties)
     local instance = Instance.new(class_name)
@@ -125,10 +126,10 @@ local top_bar = create_instance("Frame", {
 
 local meggd_badge = create_instance("Frame", {
     Parent = top_bar,
-    BackgroundColor3 = Color3.fromRGB(85, 175, 205),
+    BackgroundColor3 = Color3.fromRGB(0, 150, 255),
     BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 7),
-    Size = UDim2.new(0, 62, 0, 14)
+    Size = UDim2.new(0, 50, 0, 14)
 })
 
 local meggd_text = create_instance("TextLabel", {
@@ -150,7 +151,7 @@ local title_text = create_instance("TextLabel", {
     Position = UDim2.new(0, 10, 0, 20),
     Size = UDim2.new(0, 150, 0, 18),
     Font = Enum.Font.Arcade,
-    Text = "Script Scanner PC",
+    Text = "Script Scanner",
     TextColor3 = current_theme.text,
     TextSize = 18,
     TextXAlignment = Enum.TextXAlignment.Left
@@ -169,6 +170,7 @@ local theme_button = create_instance("TextButton", {
     TextSize = 14,
     AutoButtonColor = false
 })
+button_colors[theme_button] = current_theme.bg
 
 local close_button = create_instance("TextButton", {
     Parent = top_bar,
@@ -180,6 +182,7 @@ local close_button = create_instance("TextButton", {
     Text = "",
     AutoButtonColor = false
 })
+button_colors[close_button] = current_theme.bg
 
 local hide_button = create_instance("TextButton", {
     Parent = top_bar,
@@ -191,6 +194,21 @@ local hide_button = create_instance("TextButton", {
     Text = "",
     AutoButtonColor = false
 })
+button_colors[hide_button] = current_theme.bg
+
+local floating_hide = create_instance("TextButton", {
+    Parent = screen_gui,
+    BackgroundColor3 = current_theme.bg,
+    BorderColor3 = current_theme.border,
+    BorderSizePixel = 2,
+    Size = UDim2.new(0, 0, 0, 0),
+    Position = UDim2.new(0, 0, 0, 0),
+    Text = "",
+    AutoButtonColor = false,
+    Visible = false,
+    ZIndex = 50
+})
+button_colors[floating_hide] = current_theme.bg
 
 local search_container = create_instance("Frame", {
     Parent = main_gui,
@@ -231,12 +249,12 @@ local search_button = create_instance("TextButton", {
     Text = "",
     AutoButtonColor = false
 })
+button_colors[search_button] = current_theme.accent
 
 local function draw_pixel_icon(parent, map, color, p_size)
     local pixel_size = p_size or 2
     local width = #map[1] * pixel_size
     local height = #map * pixel_size
-    
     local container = create_instance("Frame", {
         Parent = parent,
         BackgroundTransparency = 1,
@@ -244,7 +262,6 @@ local function draw_pixel_icon(parent, map, color, p_size)
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5)
     })
-    
     for y, row in ipairs(map) do
         local x = 1
         while x <= #row do
@@ -305,116 +322,35 @@ draw_pixel_icon(close_button, {
     "10000001"
 }, Color3.fromRGB(220, 60, 60), 2)
 
-local icon_hide = draw_pixel_icon(hide_button, {
-    "0000000000",
-    "0000000000",
-    "0000000000",
-    "0111111110",
-    "0111111110",
-    "0000000000",
-    "0000000000",
-    "0000000000"
+local icon_eye_slash = draw_pixel_icon(hide_button, {
+    "000011110001",
+    "001100001110",
+    "010011110110",
+    "100110011001",
+    "100100011001",
+    "100110111001",
+    "010011110010",
+    "001110001100",
+    "100011110000"
+}, current_theme.text, 2)
+
+local icon_eye_open = draw_pixel_icon(floating_hide, {
+    "000011110000",
+    "001100001100",
+    "010011110010",
+    "100110011001",
+    "100100001001",
+    "100110011001",
+    "010011110010",
+    "001100001100",
+    "000011110000"
 }, current_theme.text, 2)
 
 local is_collapsed = false
 local original_main_size = UDim2.new(0, 420, 0, 360)
-
-local function toggle_collapse()
-    is_collapsed = not is_collapsed
-    if is_collapsed then
-        tween_service:Create(search_container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1
-        }):Play()
-        for _, c in ipairs(search_container:GetDescendants()) do
-            if c:IsA("GuiObject") then
-                local p = {}
-                p.BackgroundTransparency = 1
-                if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
-                    p.TextTransparency = 1
-                end
-                tween_service:Create(c, TweenInfo.new(0.2), p):Play()
-            end
-        end
-        tween_service:Create(content_area, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1
-        }):Play()
-        for _, c in ipairs(content_area:GetDescendants()) do
-            if c:IsA("GuiObject") then
-                local p = {}
-                p.BackgroundTransparency = 1
-                if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
-                    p.TextTransparency = 1
-                end
-                tween_service:Create(c, TweenInfo.new(0.2), p):Play()
-            end
-        end
-        tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -158, 0.5, -7),
-            Rotation = 360
-        }):Play()
-        tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -26, 0.5, -7),
-            Rotation = 360
-        }):Play()
-        tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(1, -178, 0.5, -7),
-            Rotation = 360
-        }):Play()
-        tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, main_gui.AbsoluteSize.X, 0, 46)
-        }):Play()
-    else
-        original_main_size = UDim2.new(0, main_gui.AbsoluteSize.X, 0, math.max(200, main_gui.AbsoluteSize.Y))
-        tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, original_main_size.X.Offset, 0, 360)
-        }):Play()
-        tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 80, 0, 30),
-            Position = UDim2.new(1, -168, 0, 8),
-            Rotation = 0
-        }):Play()
-        tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 30, 0, 30),
-            Position = UDim2.new(1, -38, 0, 8),
-            Rotation = 0
-        }):Play()
-        tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 30, 0, 30),
-            Position = UDim2.new(1, -178, 0, 8),
-            Rotation = 0
-        }):Play()
-        task.delay(0.15, function()
-            for _, c in ipairs(search_container:GetDescendants()) do
-                if c:IsA("GuiObject") then
-                    local p = {}
-                    p.BackgroundTransparency = 0
-                    if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
-                        p.TextTransparency = 0
-                    end
-                    tween_service:Create(c, TweenInfo.new(0.2), p):Play()
-                end
-            end
-            tween_service:Create(search_container, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-            for _, c in ipairs(content_area:GetDescendants()) do
-                if c:IsA("GuiObject") then
-                    local p = {}
-                    p.BackgroundTransparency = 0
-                    if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
-                        p.TextTransparency = 0
-                    end
-                    tween_service:Create(c, TweenInfo.new(0.2), p):Play()
-                end
-            end
-            tween_service:Create(content_area, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-        end)
-    end
-end
+local original_main_pos = UDim2.new(0.5, -200, 0.5, -150)
 
 local loading_conn
-
 local function set_search_state(state)
     if state == "search" then
         if loading_conn then loading_conn:Disconnect() loading_conn = nil end
@@ -496,6 +432,7 @@ local back_button = create_instance("TextButton", {
     TextSize = 14,
     AutoButtonColor = false
 })
+button_colors[back_button] = current_theme.border
 
 local copy_button = create_instance("TextButton", {
     Parent = code_top_bar,
@@ -506,6 +443,7 @@ local copy_button = create_instance("TextButton", {
     Text = "",
     AutoButtonColor = false
 })
+button_colors[copy_button] = current_theme.accent
 
 local icon_copy = draw_pixel_icon(copy_button, {
     "000111111100",
@@ -663,20 +601,11 @@ make_scrollbar_interactive(results_scroll)
 make_scrollbar_interactive(code_scroll)
 
 local function animate_button(button)
-    if button:GetAttribute("anim") then return end
-    button:SetAttribute("anim", true)
-    local orig = button.BackgroundColor3
-    local tw1 = tween_service:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = current_theme.text})
-    tw1:Play()
+    local orig = button_colors[button] or button.BackgroundColor3
+    tween_service:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = current_theme.text}):Play()
     task.delay(0.1, function()
         if button.Parent then
-            local tw2 = tween_service:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = orig})
-            tw2:Play()
-            tw2.Completed:Connect(function()
-                if button.Parent then
-                    button:SetAttribute("anim", false)
-                end
-            end)
+            tween_service:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = orig}):Play()
         end
     end)
 end
@@ -684,28 +613,21 @@ end
 local function bind_tap(button, callback)
     button.AutoButtonColor = false
     local start_pos = nil
-    local is_valid = false
+    local start_time = 0
     button.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             start_pos = input.Position
-            is_valid = true
-        end
-    end)
-    button.InputChanged:Connect(function(input)
-        if start_pos and input.UserInputType == Enum.UserInputType.MouseMovement then
-            if (input.Position - start_pos).Magnitude > 5 then
-                is_valid = false
-            end
+            start_time = os.clock()
         end
     end)
     button.InputEnded:Connect(function(input)
         if start_pos and input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if is_valid and (input.Position - start_pos).Magnitude < 10 then
+            local delta = (input.Position - start_pos).Magnitude
+            if delta < 5 and (os.clock() - start_time) < 0.5 then
                 animate_button(button)
                 callback()
             end
             start_pos = nil
-            is_valid = false
         end
     end)
 end
@@ -716,25 +638,34 @@ local function apply_theme(theme_name)
     main_gui.BorderColor3 = current_theme.border
     top_bar.BackgroundColor3 = current_theme.element_bg
     title_text.TextColor3 = current_theme.text
+    
     theme_button.BackgroundColor3 = current_theme.bg
     theme_button.BorderColor3 = current_theme.border
     theme_button.TextColor3 = current_theme.text
+    button_colors[theme_button] = current_theme.bg
+    
     search_container.BackgroundColor3 = current_theme.bg
     search_box.BackgroundColor3 = current_theme.element_bg
     search_box.BorderColor3 = current_theme.border
     search_box.TextColor3 = current_theme.text
     search_box.PlaceholderColor3 = current_theme.border
-    search_button.BackgroundColor3 = current_theme.accent
-    content_area.BackgroundColor3 = current_theme.bg
     
+    search_button.BackgroundColor3 = current_theme.accent
+    button_colors[search_button] = current_theme.accent
+    
+    content_area.BackgroundColor3 = current_theme.bg
     results_scroll.BackgroundColor3 = current_theme.bg
     results_scroll.ScrollBarImageColor3 = current_theme.accent
-    
     code_view_container.BackgroundColor3 = current_theme.element_bg
     code_top_bar.BackgroundColor3 = current_theme.bg
+    
     back_button.BackgroundColor3 = current_theme.border
     back_button.TextColor3 = current_theme.text
+    button_colors[back_button] = current_theme.border
+    
     copy_button.BackgroundColor3 = current_theme.accent
+    button_colors[copy_button] = current_theme.accent
+    
     lines_info.TextColor3 = current_theme.text
     code_area.BackgroundColor3 = current_theme.bg
     line_numbers_scroll.BackgroundColor3 = current_theme.element_bg
@@ -742,33 +673,38 @@ local function apply_theme(theme_name)
     handle_part_h.BackgroundColor3 = current_theme.accent
     handle_part_v.BackgroundColor3 = current_theme.accent
     
+    close_button.BackgroundColor3 = current_theme.bg
+    close_button.BorderColor3 = current_theme.border
+    button_colors[close_button] = current_theme.bg
+    
+    hide_button.BackgroundColor3 = current_theme.bg
+    hide_button.BorderColor3 = current_theme.border
+    button_colors[hide_button] = current_theme.bg
+    
+    floating_hide.BackgroundColor3 = current_theme.bg
+    floating_hide.BorderColor3 = current_theme.border
+    button_colors[floating_hide] = current_theme.bg
+    
     for _, child in ipairs(results_scroll:GetChildren()) do
         if child:IsA("Frame") and child.Name == "Result" then
             child.BackgroundColor3 = current_theme.element_bg
             child.BorderColor3 = current_theme.border
+            local click_btn = child:FindFirstChildOfClass("TextButton")
+            if click_btn then button_colors[click_btn] = current_theme.element_bg end
         end
     end
-    
     for _, child in ipairs(line_numbers_scroll:GetChildren()) do
-        if child:IsA("TextLabel") then
-            child.TextColor3 = Color3.fromRGB(150, 150, 150)
-        end
+        if child:IsA("TextLabel") then child.TextColor3 = Color3.fromRGB(150, 150, 150) end
     end
-    
     for _, child in ipairs(code_scroll:GetChildren()) do
-        if child:IsA("TextLabel") then
-            child.TextColor3 = current_theme.text
-        end
+        if child:IsA("TextLabel") then child.TextColor3 = current_theme.text end
     end
     
-    icon_search.BackgroundColor3 = current_theme.text
     for _, fr in ipairs(icon_search:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
-    icon_loading.BackgroundColor3 = current_theme.text
     for _, fr in ipairs(icon_loading:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
-    icon_copy.BackgroundColor3 = current_theme.text
     for _, fr in ipairs(icon_copy:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
-    icon_hide.BackgroundColor3 = current_theme.text
-    for _, fr in ipairs(icon_hide:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
+    for _, fr in ipairs(icon_eye_slash:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
+    for _, fr in ipairs(icon_eye_open:GetChildren()) do fr.BackgroundColor3 = current_theme.text end
 end
 
 local theme_keys = {"vscode", "dark_blue", "dracula", "monokai"}
@@ -781,7 +717,49 @@ bind_tap(theme_button, function()
 end)
 
 bind_tap(hide_button, function()
-    toggle_collapse()
+    if not is_collapsed then
+        is_collapsed = true
+        original_main_size = main_gui.Size
+        original_main_pos = main_gui.Position
+        
+        local center_pos = UDim2.new(0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X / 2, 0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y / 2)
+        
+        floating_hide.Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
+        
+        local tw = tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = center_pos
+        })
+        tw:Play()
+        tw.Completed:Connect(function()
+            main_gui.Visible = false
+            floating_hide.Visible = true
+            tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 40, 0, 40),
+                Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
+            }):Play()
+        end)
+    end
+end)
+
+bind_tap(floating_hide, function()
+    if is_collapsed then
+        is_collapsed = false
+        local center_pos = UDim2.new(0, floating_hide.Position.X.Offset + 20, 0, floating_hide.Position.Y.Offset + 20)
+        local tw = tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = center_pos
+        })
+        tw:Play()
+        tw.Completed:Connect(function()
+            floating_hide.Visible = false
+            main_gui.Visible = true
+            tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = original_main_size,
+                Position = original_main_pos
+            }):Play()
+        end)
+    end
 end)
 
 local function escape_pattern(text)
@@ -1040,6 +1018,7 @@ local function perform_search()
                 Size = UDim2.new(1, -10, 0, 55),
                 LayoutOrder = order
             })
+            button_colors[result_frame] = current_theme.element_bg
 
             create_instance("TextLabel", {
                 Name = "NameLabel",
