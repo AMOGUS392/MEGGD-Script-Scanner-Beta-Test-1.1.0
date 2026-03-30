@@ -85,47 +85,45 @@ if not getrunningscripts then table.insert(missing_funcs, "getrunningscripts") e
 
 if #missing_funcs > 0 then
     local snd = Instance.new("Sound")
-    snd.SoundId = "rbxassetid://88863438039382"
+    snd.SoundId = "rbxassetid://124177041037614"
     snd.Volume = 2
     snd.Parent = core_gui
     snd:Play()
     game.Debris:AddItem(snd, 3)
 
     local w_container = create_instance("Frame", {
-        Parent = main_gui,
+        Parent = screen_gui,
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 1, 0),
-        ZIndex = 100
+        Position = main_gui.Position,
+        Size = main_gui.Size,
+        ZIndex = 9
     })
 
-    local y_off = 56
+    local function sync_warn()
+        w_container.Position = main_gui.Position
+        w_container.Size = main_gui.Size
+    end
+    main_gui:GetPropertyChangedSignal("Position"):Connect(sync_warn)
+    main_gui:GetPropertyChangedSignal("Size"):Connect(sync_warn)
+
+    local y_off = 20
     for i, func_name in ipairs(missing_funcs) do
         local w_frame = create_instance("Frame", {
             Parent = w_container,
             BackgroundColor3 = Color3.fromRGB(0, 0, 0),
             BorderColor3 = Color3.fromRGB(255, 255, 255),
             BorderSizePixel = 2,
-            Size = UDim2.new(0, 0, 0, 30),
-            AutomaticSize = Enum.AutomaticSize.X,
-            AnchorPoint = Vector2.new(1, 0),
-            Position = UDim2.new(1.5, 0, 0, y_off),
-            ZIndex = 100
-        })
-
-        create_instance("UIPadding", {
-            Parent = w_frame,
-            PaddingLeft = UDim.new(0, 8),
-            PaddingRight = UDim.new(0, 12),
-            PaddingTop = UDim.new(0, 4),
-            PaddingBottom = UDim.new(0, 4)
+            Size = UDim2.new(0, 230, 0, 60),
+            Position = UDim2.new(1, -230, 0, y_off),
+            ZIndex = 9
         })
 
         local ic = create_instance("Frame", {
             Parent = w_frame,
             BackgroundTransparency = 1,
             Size = UDim2.new(0, 24, 0, 16),
-            Position = UDim2.new(0, 0, 0.5, -8),
-            ZIndex = 100
+            Position = UDim2.new(0, 10, 0.5, -8),
+            ZIndex = 9
         })
 
         local map = {
@@ -150,7 +148,7 @@ if #missing_funcs > 0 then
                         Position = UDim2.new(0, (mx - 1) * 2, 0, (my - 1) * 2),
                         Size = UDim2.new(0, 2, 0, 2),
                         BackgroundColor3 = col,
-                        ZIndex = 100
+                        ZIndex = 9
                     })
                 end
             end
@@ -159,26 +157,27 @@ if #missing_funcs > 0 then
         create_instance("TextLabel", {
             Parent = w_frame,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 32, 0, 0),
-            Size = UDim2.new(0, 0, 1, 0),
-            AutomaticSize = Enum.AutomaticSize.X,
+            Position = UDim2.new(0, 44, 0, 0),
+            Size = UDim2.new(1, -48, 1, 0),
             Font = Enum.Font.Arcade,
-            TextSize = 16,
+            TextSize = 14,
             RichText = true,
-            Text = '<font color="rgb(255,0,0)">Your executor does not support the </font><font color="rgb(255,255,0)">' .. func_name .. '</font><font color="rgb(255,0,0)"> feature.</font>',
+            TextWrapped = true,
+            Text = '<font color="rgb(255,0,0)">Your executor does not\nsupport the </font><font color="rgb(255,255,0)">' .. func_name .. '</font><font color="rgb(255,0,0)"> feature.</font>',
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 100
+            TextYAlignment = Enum.TextYAlignment.Center,
+            ZIndex = 9
         })
 
         tween_service:Create(w_frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Position = UDim2.new(1, -10, 0, y_off)
+            Position = UDim2.new(1, 10, 0, y_off)
         }):Play()
 
-        y_off = y_off + 36
+        y_off = y_off + 70
 
         task.delay(2.5 + (i * 0.2), function()
             local tw_out = tween_service:Create(w_frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                Position = UDim2.new(1.5, 0, 0, w_frame.Position.Y.Offset)
+                Position = UDim2.new(1, -230, 0, w_frame.Position.Y.Offset)
             })
             tw_out:Play()
             tw_out.Completed:Connect(function()
@@ -238,7 +237,7 @@ local top_bar = create_instance("Frame", {
 
 local meggd_badge = create_instance("Frame", {
     Parent = top_bar,
-    BackgroundColor3 = Color3.fromRGB(0, 150, 255),
+    BackgroundTransparency = 1,
     BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 7),
     Size = UDim2.new(0, 50, 0, 14)
@@ -252,6 +251,8 @@ local meggd_text = create_instance("TextLabel", {
     Font = Enum.Font.Arcade,
     Text = "MEGGD",
     TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextStrokeTransparency = 0,
+    TextStrokeColor3 = Color3.fromRGB(0, 200, 255),
     TextSize = 14,
     TextXAlignment = Enum.TextXAlignment.Center,
     TextYAlignment = Enum.TextYAlignment.Center
@@ -828,91 +829,6 @@ bind_tap(theme_button, function()
     apply_theme(theme_keys[theme_index])
 end)
 
-bind_tap(hide_button, function()
-    if not is_collapsed then
-        is_collapsed = true
-        original_main_size = main_gui.Size
-        original_main_pos = main_gui.Position
-        
-        local center_pos = UDim2.new(0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X / 2, 0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y / 2)
-        
-        floating_hide.Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
-        
-        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 0, 0, 0)
-        }):Play()
-
-        local tw = tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = center_pos
-        })
-        tw:Play()
-        tw.Completed:Connect(function()
-            main_gui.Visible = false
-            floating_hide.Visible = true
-            tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 40, 0, 40),
-                Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
-            }):Play()
-        end)
-    end
-end)
-
-bind_tap(floating_hide, function()
-    if is_collapsed then
-        is_collapsed = false
-        local center_pos = UDim2.new(0, floating_hide.Position.X.Offset + 20, 0, floating_hide.Position.Y.Offset + 20)
-        local tw = tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = center_pos
-        })
-        tw:Play()
-        tw.Completed:Connect(function()
-            floating_hide.Visible = false
-            main_gui.Visible = true
-            
-            tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = UDim2.new(0, 20, 0, 20)
-            }):Play()
-
-            tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                Size = original_main_size,
-                Position = original_main_pos
-            }):Play()
-        end)
-    end
-end)
-
-local is_dragging_floating = false
-local floating_drag_start_pos
-local floating_start_pos
-
-floating_hide.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        is_dragging_floating = true
-        floating_drag_start_pos = input.Position
-        floating_start_pos = floating_hide.Position
-    end
-end)
-
-user_input_service.InputChanged:Connect(function(input)
-    if is_dragging_floating and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-        local delta = input.Position - floating_drag_start_pos
-        floating_hide.Position = UDim2.new(
-            floating_start_pos.X.Scale,
-            floating_start_pos.X.Offset + delta.X,
-            floating_start_pos.Y.Scale,
-            floating_start_pos.Y.Offset + delta.Y
-        )
-    end
-end)
-
-user_input_service.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        is_dragging_floating = false
-    end
-end)
-
 local function escape_pattern(text)
     return text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
 end
@@ -1343,6 +1259,97 @@ user_input_service.InputEnded:Connect(function(input)
             tween_service:Create(handle_part_v, TweenInfo.new(0.2), {BackgroundColor3 = current_theme.accent, Size = UDim2.new(0, 4, 1, 0)}):Play()
             tween_service:Create(resize_handle, TweenInfo.new(0.2), {Size = UDim2.new(0, 20, 0, 20)}):Play()
         end
+    end
+end)
+
+local is_dragging_floating = false
+local floating_drag_moved = false
+local floating_drag_start_pos
+local floating_start_pos
+
+floating_hide.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        is_dragging_floating = true
+        floating_drag_moved = false
+        floating_drag_start_pos = input.Position
+        floating_start_pos = floating_hide.Position
+    end
+end)
+
+user_input_service.InputChanged:Connect(function(input)
+    if is_dragging_floating and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        local delta = input.Position - floating_drag_start_pos
+        if delta.Magnitude > 5 then
+            floating_drag_moved = true
+        end
+        floating_hide.Position = UDim2.new(
+            floating_start_pos.X.Scale,
+            floating_start_pos.X.Offset + delta.X,
+            floating_start_pos.Y.Scale,
+            floating_start_pos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+user_input_service.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if is_dragging_floating then
+            is_dragging_floating = false
+            if not floating_drag_moved then
+                if is_collapsed then
+                    is_collapsed = false
+                    local center_pos = UDim2.new(0, floating_hide.Position.X.Offset + 20, 0, floating_hide.Position.Y.Offset + 20)
+                    local tw = tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                        Size = UDim2.new(0, 0, 0, 0),
+                        Position = center_pos
+                    })
+                    tw:Play()
+                    tw.Completed:Connect(function()
+                        floating_hide.Visible = false
+                        main_gui.Visible = true
+                        
+                        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            Size = UDim2.new(0, 20, 0, 20)
+                        }):Play()
+
+                        tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            Size = original_main_size,
+                            Position = original_main_pos
+                        }):Play()
+                    end)
+                end
+            end
+        end
+    end
+end)
+
+bind_tap(hide_button, function()
+    if not is_collapsed then
+        is_collapsed = true
+        original_main_size = main_gui.Size
+        original_main_pos = main_gui.Position
+        
+        local center_pos = UDim2.new(0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X / 2, 0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y / 2)
+        
+        floating_hide.Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
+        
+        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0)
+        }):Play()
+
+        local tw = tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = center_pos
+        })
+        tw:Play()
+        tw.Completed:Connect(function()
+            main_gui.Visible = false
+            floating_hide.Visible = true
+            tween_service:Create(floating_hide, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 40, 0, 40),
+                Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
+            }):Play()
+        end)
     end
 end)
 print("MEGGD Script Scanner Mobile - Loaded!")
