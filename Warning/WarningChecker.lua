@@ -8,7 +8,7 @@ gui.Parent = gethui and gethui() or core_gui
 local missing_funcs = {}
 if not decompile then table.insert(missing_funcs, "decompile") end
 if not getscripthash then table.insert(missing_funcs, "getscripthash") end
-if not getscripts then table.insert(missing_funcs, "getscripts") end
+if not getscript then table.insert(missing_funcs, "getscripts") end
 if not getnilinstances then table.insert(missing_funcs, "getnilinstances") end
 if not getloadedmodules then table.insert(missing_funcs, "getloadedmodules") end
 if not getrunningscripts then table.insert(missing_funcs, "getrunningscripts") end
