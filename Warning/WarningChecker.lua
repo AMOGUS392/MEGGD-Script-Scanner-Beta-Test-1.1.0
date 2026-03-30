@@ -15,7 +15,7 @@ if not m then return end
 local f = {}
 if not decompile then table.insert(f, "decompile") end
 if not getscripthash then table.insert(f, "getscripthash") end
-if not getscripts then table.insert(f, "getscripts") end
+if not getscript then table.insert(f, "getscripts") end
 if not getnilinstances then table.insert(f, "getnilinstances") end
 if not getloadedmodules then table.insert(f, "getloadedmodules") end
 if not getrunningscripts then table.insert(f, "getrunningscripts") end
