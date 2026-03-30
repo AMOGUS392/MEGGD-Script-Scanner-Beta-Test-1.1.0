@@ -1069,3 +1069,4 @@ user_input_service.InputEnded:Connect(function(input)
         end
     end
 end)
+print("MEGGD Script Scanner Mobile - Loaded!")
