@@ -4,6 +4,8 @@ local run_service = game:GetService("RunService")
 local text_service = game:GetService("TextService")
 local core_gui = game:GetService("CoreGui")
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/FunctionCheck.lua", true))()
+
 local themes = {
     dark_blue = {
         bg = Color3.fromRGB(15, 20, 30),
@@ -148,7 +150,7 @@ local title_text = create_instance("TextLabel", {
     Position = UDim2.new(0, 10, 0, 20),
     Size = UDim2.new(0, 150, 0, 18),
     Font = Enum.Font.Arcade,
-    Text = "Script Scanner PC",
+    Text = "Script Scanner",
     TextColor3 = current_theme.text,
     TextSize = 18,
     TextXAlignment = Enum.TextXAlignment.Left
@@ -159,7 +161,7 @@ local theme_button = create_instance("TextButton", {
     BackgroundColor3 = current_theme.bg,
     BorderColor3 = current_theme.border,
     BorderSizePixel = 1,
-    Position = UDim2.new(1, -128, 0, 8),
+    Position = UDim2.new(1, -168, 0, 8),
     Size = UDim2.new(0, 80, 0, 30),
     Font = Enum.Font.Arcade,
     Text = "THEME",
@@ -174,6 +176,17 @@ local close_button = create_instance("TextButton", {
     BorderColor3 = current_theme.border,
     BorderSizePixel = 1,
     Position = UDim2.new(1, -38, 0, 8),
+    Size = UDim2.new(0, 30, 0, 30),
+    Text = "",
+    AutoButtonColor = false
+})
+
+local hide_button = create_instance("TextButton", {
+    Parent = top_bar,
+    BackgroundColor3 = current_theme.bg,
+    BorderColor3 = current_theme.border,
+    BorderSizePixel = 1,
+    Position = UDim2.new(1, -178, 0, 8),
     Size = UDim2.new(0, 30, 0, 30),
     Text = "",
     AutoButtonColor = false
@@ -291,6 +304,108 @@ draw_pixel_icon(close_button, {
     "01000010",
     "10000001"
 }, Color3.fromRGB(220, 60, 60), 2)
+
+draw_pixel_icon(hide_button, {
+    "00000000",
+    "00000000",
+    "00000000",
+    "11111111",
+    "11111111",
+    "00000000",
+    "00000000",
+    "00000000"
+}, Color3.fromRGB(160, 200, 255), 2)
+
+local is_collapsed = false
+local original_main_size = UDim2.new(0, 420, 0, 360)
+
+local function toggle_collapse()
+    is_collapsed = not is_collapsed
+    if is_collapsed then
+        tween_service:Create(search_container, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 1
+        }):Play()
+        for _, c in ipairs(search_container:GetDescendants()) do
+            if c:IsA("GuiObject") then
+                local p = {}
+                p.BackgroundTransparency = 1
+                if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+                    p.TextTransparency = 1
+                end
+                tween_service:Create(c, TweenInfo.new(0.2), p):Play()
+            end
+        end
+        tween_service:Create(content_area, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 1
+        }):Play()
+        for _, c in ipairs(content_area:GetDescendants()) do
+            if c:IsA("GuiObject") then
+                local p = {}
+                p.BackgroundTransparency = 1
+                if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+                    p.TextTransparency = 1
+                end
+                tween_service:Create(c, TweenInfo.new(0.2), p):Play()
+            end
+        end
+        tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 14, 0, 14),
+            Position = UDim2.new(1, -158, 0.5, -7)
+        }):Play()
+        tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 14, 0, 14),
+            Position = UDim2.new(1, -26, 0.5, -7)
+        }):Play()
+        tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 14, 0, 14),
+            Position = UDim2.new(1, -178, 0.5, -7)
+        }):Play()
+        tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, main_gui.AbsoluteSize.X, 0, 46)
+        }):Play()
+    else
+        original_main_size = UDim2.new(0, main_gui.AbsoluteSize.X, 0, math.max(200, main_gui.AbsoluteSize.Y))
+        tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, original_main_size.X.Offset, 0, 360)
+        }):Play()
+        tween_service:Create(theme_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 80, 0, 30),
+            Position = UDim2.new(1, -168, 0, 8)
+        }):Play()
+        tween_service:Create(close_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 30, 0, 30),
+            Position = UDim2.new(1, -38, 0, 8)
+        }):Play()
+        tween_service:Create(hide_button, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 30, 0, 30),
+            Position = UDim2.new(1, -178, 0, 8)
+        }):Play()
+        task.delay(0.15, function()
+            for _, c in ipairs(search_container:GetDescendants()) do
+                if c:IsA("GuiObject") then
+                    local p = {}
+                    p.BackgroundTransparency = 0
+                    if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+                        p.TextTransparency = 0
+                    end
+                    tween_service:Create(c, TweenInfo.new(0.2), p):Play()
+                end
+            end
+            tween_service:Create(search_container, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+            for _, c in ipairs(content_area:GetDescendants()) do
+                if c:IsA("GuiObject") then
+                    local p = {}
+                    p.BackgroundTransparency = 0
+                    if c:IsA("TextLabel") or c:IsA("TextButton") or c:IsA("TextBox") then
+                        p.TextTransparency = 0
+                    end
+                    tween_service:Create(c, TweenInfo.new(0.2), p):Play()
+                end
+            end
+            tween_service:Create(content_area, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+        end)
+    end
+end
 
 local loading_conn
 
@@ -657,6 +772,10 @@ bind_tap(theme_button, function()
     apply_theme(theme_keys[theme_index])
 end)
 
+bind_tap(hide_button, function()
+    toggle_collapse()
+end)
+
 local function escape_pattern(text)
     return text:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
 end
@@ -797,37 +916,35 @@ local function perform_search()
     end
     results_scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
     local raw_query = search_box.Text
-    local query = string.lower(raw_query)
-    if query == "" then return end
-    
-    local safe_query = escape_pattern(query)
+    if raw_query == "" then return end
+
+    local terms = {}
+    for term in raw_query:gmatch("[^,]+") do
+        local t = term:match("^%s*(.-)%s*$")
+        if #t > 0 then
+            table.insert(terms, string.lower(t))
+            if #terms >= 25 then break end
+        end
+    end
+    if #terms == 0 then return end
+
     set_search_state("loading")
-    
+
     search_thread = task.spawn(function()
         local all_scripts_set = {}
         local all_scripts = {}
-        
+
         local function add_script(scr)
             if typeof(scr) == "Instance" and (scr:IsA("LocalScript") or scr:IsA("ModuleScript") or scr:IsA("Script")) and not all_scripts_set[scr] then
                 all_scripts_set[scr] = true
                 table.insert(all_scripts, scr)
             end
         end
-        
-        local function get_priority(scr)
-            local path = scr:GetFullName()
-            if path:find("Players%.LocalPlayer") then return 1 end
-            if path:find("ReplicatedStorage") then return 2 end
-            if path:find("Workspace") then return 3 end
-            if path:find("Starter") then return 4 end
-            if path:find("CoreGui") then return 10 end
-            return 5
-        end
-        
+
         local insts
         pcall(function() insts = getinstances() end)
         if not insts then insts = game:GetDescendants() end
-        
+
         local y_counter = 0
         for i = 1, #insts do
             add_script(insts[i])
@@ -837,140 +954,151 @@ local function perform_search()
                 y_counter = 0
             end
         end
-        
+
         if getscripts then for _, scr in ipairs(getscripts()) do add_script(scr) end end
         if getnilinstances then for _, scr in ipairs(getnilinstances()) do add_script(scr) end end
         if getloadedmodules then for _, scr in ipairs(getloadedmodules()) do add_script(scr) end end
         if getrunningscripts then for _, scr in ipairs(getrunningscripts()) do add_script(scr) end end
-        
-        table.sort(all_scripts, function(a, b)
-            return get_priority(a) < get_priority(b)
-        end)
-        
+
+        local matched_results = {}
         local start_time = os.clock()
-        
+
         for _, script_instance in ipairs(all_scripts) do
             if os.clock() - start_time > 0.01 then
                 task.wait()
                 start_time = os.clock()
             end
-            
-            local script_name = string.lower(script_instance.Name)
-            local is_match = string.find(script_name, safe_query, 1, false)
-            local match_count = 0
-            
+
             local code = decompile_cache[script_instance]
-            
-            if not is_match and not code and #raw_query >= 2 then
+            if not code then
                 local s, res = pcall(decompile, script_instance)
-                if s and type(res) == "string" then
+                if s and type(res) == "string" and #res > 0 then
                     code = res
                     decompile_cache[script_instance] = code
                 end
                 task.wait()
                 start_time = os.clock()
             end
-            
-            if not is_match and code then
-                local _, count = string.gsub(string.lower(code), safe_query, "")
-                if count > 0 then
-                    is_match = true
-                    match_count = count
+
+            local all_match = true
+            local total_count = 0
+            local script_name_lower = string.lower(script_instance.Name)
+            local code_lower = code and string.lower(code) or ""
+
+            for _, term in ipairs(terms) do
+                local safe_term = escape_pattern(term)
+                local name_hit = string.find(script_name_lower, safe_term, 1, false)
+                local code_count = 0
+                if #code_lower > 0 then
+                    local _, cnt = string.gsub(code_lower, safe_term, "")
+                    code_count = cnt
                 end
-            elseif is_match and code then
-                local _, count = string.gsub(string.lower(code), safe_query, "")
-                match_count = count
+                if not name_hit and code_count == 0 then
+                    all_match = false
+                    break
+                end
+                if name_hit then total_count = total_count + 1 end
+                total_count = total_count + code_count
             end
-            
-            if is_match then
-                local hash_text = "HASH: N/A"
-                if getscripthash then
-                    pcall(function()
-                        local h = getscripthash(script_instance)
-                        if h then hash_text = "HASH: " .. string.sub(h, 1, 12) .. "..." end
-                    end)
-                end
-                
-                local path_text = script_instance:GetFullName()
-                
-                local result_frame = create_instance("Frame", {
-                    Name = "Result",
-                    Parent = results_scroll,
-                    BackgroundColor3 = current_theme.element_bg,
-                    BorderColor3 = current_theme.border,
-                    BorderSizePixel = 1,
-                    Size = UDim2.new(1, -10, 0, 55)
-                })
-                
-                local s_color = type_colors[script_instance.ClassName] or current_theme.text
-                
-                create_instance("TextLabel", {
-                    Name = "NameLabel",
-                    Parent = result_frame,
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 10, 0, 5),
-                    Size = UDim2.new(0.7, 0, 0, 14),
-                    Font = Enum.Font.Arcade,
-                    Text = script_instance.Name .. " (" .. script_instance.ClassName .. ")",
-                    TextColor3 = s_color,
-                    TextSize = 14,
-                    TextXAlignment = Enum.TextXAlignment.Left
-                })
-                
-                create_instance("TextLabel", {
-                    Name = "HashLabel",
-                    Parent = result_frame,
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 10, 0, 20),
-                    Size = UDim2.new(0.7, 0, 0, 14),
-                    Font = Enum.Font.Arcade,
-                    Text = hash_text,
-                    TextColor3 = Color3.fromRGB(150, 150, 150),
-                    TextSize = 12,
-                    TextXAlignment = Enum.TextXAlignment.Left
-                })
-                
-                create_instance("TextLabel", {
-                    Name = "PathLabel",
-                    Parent = result_frame,
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 10, 0, 35),
-                    Size = UDim2.new(1, -60, 0, 14),
-                    Font = Enum.Font.Arcade,
-                    Text = "PATH: " .. path_text,
-                    TextColor3 = Color3.fromRGB(100, 100, 100),
-                    TextSize = 12,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextTruncate = Enum.TextTruncate.AtEnd
-                })
-                
-                if match_count > 0 then
-                    create_instance("TextLabel", {
-                        Parent = result_frame,
-                        BackgroundTransparency = 1,
-                        Position = UDim2.new(1, -110, 0, 0),
-                        Size = UDim2.new(0, 100, 1, 0),
-                        Font = Enum.Font.Arcade,
-                        Text = tostring(match_count) .. " MATCH",
-                        TextColor3 = current_theme.accent,
-                        TextSize = 12,
-                        TextXAlignment = Enum.TextXAlignment.Right
-                    })
-                end
-                
-                local click_btn = create_instance("TextButton", {
-                    Parent = result_frame,
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 1, 0),
-                    Text = ""
-                })
-                
-                bind_tap(click_btn, function()
-                    view_code(script_instance)
-                end)
+
+            if all_match then
+                table.insert(matched_results, {script = script_instance, count = total_count})
             end
         end
-        
+
+        table.sort(matched_results, function(a, b) return a.count > b.count end)
+
+        for order, entry in ipairs(matched_results) do
+            local script_instance = entry.script
+            local match_count = entry.count
+
+            local hash_text = "HASH: N/A"
+            if getscripthash then
+                pcall(function()
+                    local h = getscripthash(script_instance)
+                    if h then hash_text = "HASH: " .. string.sub(h, 1, 12) .. "..." end
+                end)
+            end
+
+            local path_text = script_instance:GetFullName()
+            local s_color = type_colors[script_instance.ClassName] or current_theme.text
+
+            local result_frame = create_instance("Frame", {
+                Name = "Result",
+                Parent = results_scroll,
+                BackgroundColor3 = current_theme.element_bg,
+                BorderColor3 = current_theme.border,
+                BorderSizePixel = 1,
+                Size = UDim2.new(1, -10, 0, 55),
+                LayoutOrder = order
+            })
+
+            create_instance("TextLabel", {
+                Name = "NameLabel",
+                Parent = result_frame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 10, 0, 5),
+                Size = UDim2.new(0.7, 0, 0, 14),
+                Font = Enum.Font.Arcade,
+                Text = script_instance.Name .. " (" .. script_instance.ClassName .. ")",
+                TextColor3 = s_color,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            create_instance("TextLabel", {
+                Name = "HashLabel",
+                Parent = result_frame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 10, 0, 20),
+                Size = UDim2.new(0.7, 0, 0, 14),
+                Font = Enum.Font.Arcade,
+                Text = hash_text,
+                TextColor3 = Color3.fromRGB(150, 150, 150),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            })
+
+            create_instance("TextLabel", {
+                Name = "PathLabel",
+                Parent = result_frame,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 10, 0, 35),
+                Size = UDim2.new(1, -60, 0, 14),
+                Font = Enum.Font.Arcade,
+                Text = "PATH: " .. path_text,
+                TextColor3 = Color3.fromRGB(100, 100, 100),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextTruncate = Enum.TextTruncate.AtEnd
+            })
+
+            if match_count > 0 then
+                create_instance("TextLabel", {
+                    Parent = result_frame,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -110, 0, 0),
+                    Size = UDim2.new(0, 100, 1, 0),
+                    Font = Enum.Font.Arcade,
+                    Text = tostring(match_count) .. " MATCH",
+                    TextColor3 = current_theme.accent,
+                    TextSize = 12,
+                    TextXAlignment = Enum.TextXAlignment.Right
+                })
+            end
+
+            local click_btn = create_instance("TextButton", {
+                Parent = result_frame,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = ""
+            })
+
+            bind_tap(click_btn, function()
+                view_code(script_instance)
+            end)
+        end
+
         set_search_state("search")
     end)
 end
