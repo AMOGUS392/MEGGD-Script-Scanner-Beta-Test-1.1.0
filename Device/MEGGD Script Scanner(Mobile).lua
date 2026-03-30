@@ -4,7 +4,7 @@ local run_service = game:GetService("RunService")
 local text_service = game:GetService("TextService")
 local core_gui = game:GetService("CoreGui")
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
+loadstring(game:HttpGet("YOUR_WARNING_CHECKER_URL_HERE", true))()
 
 local themes = {
     dark_blue = {
@@ -126,7 +126,7 @@ local top_bar = create_instance("Frame", {
 
 local meggd_badge = create_instance("Frame", {
     Parent = top_bar,
-    BackgroundColor3 = Color3.fromRGB(0, 150, 255),
+    BackgroundTransparency = 1,
     BorderSizePixel = 0,
     Position = UDim2.new(0, 10, 0, 7),
     Size = UDim2.new(0, 50, 0, 14)
@@ -140,8 +140,10 @@ local meggd_text = create_instance("TextLabel", {
     Font = Enum.Font.Arcade,
     Text = "MEGGD",
     TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextStrokeTransparency = 0,
+    TextStrokeColor3 = Color3.fromRGB(0, 200, 255),
     TextSize = 14,
-    TextXAlignment = Enum.TextXAlignment.Center,
+    TextXAlignment = Enum.TextXAlignment.Left,
     TextYAlignment = Enum.TextYAlignment.Center
 })
 
@@ -162,7 +164,7 @@ local theme_button = create_instance("TextButton", {
     BackgroundColor3 = current_theme.bg,
     BorderColor3 = current_theme.border,
     BorderSizePixel = 1,
-    Position = UDim2.new(1, -168, 0, 8),
+    Position = UDim2.new(1, -156, 0, 8),
     Size = UDim2.new(0, 80, 0, 30),
     Font = Enum.Font.Arcade,
     Text = "THEME",
@@ -171,6 +173,18 @@ local theme_button = create_instance("TextButton", {
     AutoButtonColor = false
 })
 button_colors[theme_button] = current_theme.bg
+
+local hide_button = create_instance("TextButton", {
+    Parent = top_bar,
+    BackgroundColor3 = current_theme.bg,
+    BorderColor3 = current_theme.border,
+    BorderSizePixel = 1,
+    Position = UDim2.new(1, -72, 0, 8),
+    Size = UDim2.new(0, 30, 0, 30),
+    Text = "",
+    AutoButtonColor = false
+})
+button_colors[hide_button] = current_theme.bg
 
 local close_button = create_instance("TextButton", {
     Parent = top_bar,
@@ -183,18 +197,6 @@ local close_button = create_instance("TextButton", {
     AutoButtonColor = false
 })
 button_colors[close_button] = current_theme.bg
-
-local hide_button = create_instance("TextButton", {
-    Parent = top_bar,
-    BackgroundColor3 = current_theme.bg,
-    BorderColor3 = current_theme.border,
-    BorderSizePixel = 1,
-    Position = UDim2.new(1, -178, 0, 8),
-    Size = UDim2.new(0, 30, 0, 30),
-    Text = "",
-    AutoButtonColor = false
-})
-button_colors[hide_button] = current_theme.bg
 
 local floating_hide = create_instance("TextButton", {
     Parent = screen_gui,
@@ -554,12 +556,10 @@ local function make_scrollbar_interactive(scroll_frame)
             local rect = scroll_frame.AbsolutePosition
             local size = scroll_frame.AbsoluteSize
             local thickness = scroll_frame.ScrollBarThickness
-            
             if input.Position.X >= rect.X + size.X - thickness - 5 then
                 is_dragging = true
                 drag_start_y = input.Position.Y
                 start_canvas_pos = scroll_frame.CanvasPosition.Y
-                
                 local h, s, v = current_theme.accent:ToHSV()
                 tween_service:Create(scroll_frame, TweenInfo.new(0.15), {
                     ScrollBarImageColor3 = Color3.fromHSV(h, s * 0.5, math.min(1, v * 1.5))
@@ -573,15 +573,12 @@ local function make_scrollbar_interactive(scroll_frame)
             local size = scroll_frame.AbsoluteSize
             local content_size = scroll_frame.CanvasSize.Y.Offset
             local max_scroll = math.max(0, content_size - size.Y)
-            
             if max_scroll > 0 then
                 local delta_y = input.Position.Y - drag_start_y
                 local track_space = size.Y
                 local scroll_ratio = max_scroll / track_space
-                
                 local new_pos = start_canvas_pos + (delta_y * scroll_ratio * 1.5)
                 new_pos = math.clamp(new_pos, 0, max_scroll)
-                
                 scroll_frame.CanvasPosition = Vector2.new(scroll_frame.CanvasPosition.X, new_pos)
             end
         end
@@ -721,16 +718,16 @@ bind_tap(hide_button, function()
         is_collapsed = true
         original_main_size = main_gui.Size
         original_main_pos = main_gui.Position
-        
         local center_pos = UDim2.new(0, main_gui.AbsolutePosition.X + main_gui.AbsoluteSize.X / 2, 0, main_gui.AbsolutePosition.Y + main_gui.AbsoluteSize.Y / 2)
-        
         floating_hide.Position = UDim2.new(0, center_pos.X.Offset - 20, 0, center_pos.Y.Offset - 20)
-        
         local tw = tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 0, 0, 0),
             Position = center_pos
         })
         tw:Play()
+        tween_service:Create(resize_handle, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 0, 0, 0)
+        }):Play()
         tw.Completed:Connect(function()
             main_gui.Visible = false
             floating_hide.Visible = true
@@ -757,6 +754,9 @@ bind_tap(floating_hide, function()
             tween_service:Create(main_gui, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                 Size = original_main_size,
                 Position = original_main_pos
+            }):Play()
+            tween_service:Create(resize_handle, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = UDim2.new(0, 20, 0, 20)
             }):Play()
         end)
     end
@@ -1022,7 +1022,7 @@ local function perform_search()
             local result_frame = create_instance("Frame", {
                 Name = "Result",
                 Parent = results_scroll,
-                BackgroundColor = current_theme.element_bg,
+                BackgroundColor3 = current_theme.element_bg,
                 BorderColor3 = current_theme.border,
                 BorderSizePixel = 1,
                 Size = UDim2.new(1, -10, 0, 55),
