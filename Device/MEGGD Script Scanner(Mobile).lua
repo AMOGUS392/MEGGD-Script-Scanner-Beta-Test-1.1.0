@@ -75,6 +75,119 @@ local main_gui = create_instance("Frame", {
     ZIndex = 10
 })
 
+local missing_funcs = {}
+if not decompile then table.insert(missing_funcs, "decompile") end
+if not getscripthash then table.insert(missing_funcs, "getscripthash") end
+if not getscripts then table.insert(missing_funcs, "getscripts") end
+if not getnilinstances then table.insert(missing_funcs, "getnilinstances") end
+if not getloadedmodules then table.insert(missing_funcs, "getloadedmodules") end
+if not getrunningscripts then table.insert(missing_funcs, "getrunningscripts") end
+
+if #missing_funcs > 0 then
+    local snd = Instance.new("Sound")
+    snd.SoundId = "rbxassetid://88863438039382"
+    snd.Volume = 2
+    snd.Parent = core_gui
+    snd:Play()
+    game.Debris:AddItem(snd, 3)
+
+    local w_container = create_instance("Frame", {
+        Parent = main_gui,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 1, 0),
+        ZIndex = 100
+    })
+
+    local y_off = 56
+    for i, func_name in ipairs(missing_funcs) do
+        local w_frame = create_instance("Frame", {
+            Parent = w_container,
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            BorderColor3 = Color3.fromRGB(255, 255, 255),
+            BorderSizePixel = 2,
+            Size = UDim2.new(0, 0, 0, 30),
+            AutomaticSize = Enum.AutomaticSize.X,
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1.5, 0, 0, y_off),
+            ZIndex = 100
+        })
+
+        create_instance("UIPadding", {
+            Parent = w_frame,
+            PaddingLeft = UDim.new(0, 8),
+            PaddingRight = UDim.new(0, 12),
+            PaddingTop = UDim.new(0, 4),
+            PaddingBottom = UDim.new(0, 4)
+        })
+
+        local ic = create_instance("Frame", {
+            Parent = w_frame,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(0, 24, 0, 16),
+            Position = UDim2.new(0, 0, 0.5, -8),
+            ZIndex = 100
+        })
+
+        local map = {
+            "000002200000",
+            "000022220000",
+            "000221122000",
+            "002221122200",
+            "022221122220",
+            "222220022222",
+            "222221122222",
+            "222222222222"
+        }
+
+        for my, row in ipairs(map) do
+            for mx = 1, #row do
+                local char = row:sub(mx, mx)
+                if char ~= "0" then
+                    local col = char == "2" and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255)
+                    create_instance("Frame", {
+                        Parent = ic,
+                        BorderSizePixel = 0,
+                        Position = UDim2.new(0, (mx - 1) * 2, 0, (my - 1) * 2),
+                        Size = UDim2.new(0, 2, 0, 2),
+                        BackgroundColor3 = col,
+                        ZIndex = 100
+                    })
+                end
+            end
+        end
+
+        create_instance("TextLabel", {
+            Parent = w_frame,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 32, 0, 0),
+            Size = UDim2.new(0, 0, 1, 0),
+            AutomaticSize = Enum.AutomaticSize.X,
+            Font = Enum.Font.Arcade,
+            TextSize = 16,
+            RichText = true,
+            Text = '<font color="rgb(255,0,0)">Your executor does not support the </font><font color="rgb(255,255,0)">' .. func_name .. '</font><font color="rgb(255,0,0)"> feature.</font>',
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 100
+        })
+
+        tween_service:Create(w_frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = UDim2.new(1, -10, 0, y_off)
+        }):Play()
+
+        y_off = y_off + 36
+
+        task.delay(2.5 + (i * 0.2), function()
+            local tw_out = tween_service:Create(w_frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                Position = UDim2.new(1.5, 0, 0, w_frame.Position.Y.Offset)
+            })
+            tw_out:Play()
+            tw_out.Completed:Connect(function()
+                w_frame:Destroy()
+            end)
+        end)
+    end
+end
+
 local resize_handle = create_instance("Frame", {
     Name = "resize_handle",
     Parent = screen_gui,
@@ -1232,6 +1345,4 @@ user_input_service.InputEnded:Connect(function(input)
         end
     end
 end)
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/AMOGUS392/MEGGD-Script-Scanner-Beta-Test-1.1.0/refs/heads/main/Warning/WarningChecker.lua", true))()
 print("MEGGD Script Scanner Mobile - Loaded!")
